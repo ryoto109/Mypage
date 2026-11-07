@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0000aa">
+<title>REQUEST — RYOTO TAKEUCHI</title>
+<meta name="description" content="竹内 稜人への依頼フォーム">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b10ad;
+    --bsod: #0000aa;
+    --field: #1a1fb7;
+    --field-line: #3036c8;
+    --ph: #6268d8;
+    --white: #fff;
+    --err: #ff6b6b;
+    --sans: "Inter", "Noto Sans JP", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; background: var(--bg); }
+  body {
+    background: var(--bg); color: var(--white);
+    font-family: var(--sans); font-weight: 500;
+    min-height: 100svh;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  /* ---- ブルースクリーン風カバー ---- */
+  .cover {
+    background: var(--bsod);
+    padding: calc(14px + env(safe-area-inset-top)) 16px 26px;
+    min-height: 150px;
+    font-family: var(--mono); font-size: 11px; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-all;
+    overflow: hidden;
+  }
+  .cover .cur { display: inline-block; width: .6em; height: 1.1em; background: var(--white); vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 20px 48px; }
+
+  /* ---- アバター + ラベル ---- */
+  .avatar { position: relative; height: 70px; margin-top: -1px; }
+  .avatar .circle {
+    position: absolute; left: 0; top: -2px;
+    width: 128px; height: 128px; border-radius: 50%;
+    background: #0809a0;
+    transform: translateY(-50%);
+  }
+  .avatar .label {
+    position: absolute; left: 6px; top: -22px;
+    background: var(--white); color: var(--bsod);
+    font-family: var(--mono); font-size: 14px; line-height: 1; letter-spacing: -.02em;
+    padding: 2px 10px 1px; border: 1px solid var(--bsod);
+  }
+
+  h1 {
+    margin-top: 40px;
+    font-weight: 800; font-size: clamp(34px, 9.5vw, 52px); line-height: 1.12;
+    letter-spacing: -.01em; text-transform: uppercase;
+  }
+  .lead { margin-top: 12px; font-size: 14px; line-height: 1.7; opacity: .8; }
+
+  /* ---- form ---- */
+  form { margin-top: 32px; display: grid; gap: 14px; }
+  .group { margin-top: 26px; display: grid; gap: 14px; }
+  .group:first-of-type { margin-top: 0; }
+  h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; display: flex; align-items: center; gap: 10px; }
+  h2.big { font-size: clamp(28px, 7.5vw, 36px); margin-top: 60px; }
+  .star { font-size: 18px; line-height: 1; }
+
+  .field { position: relative; }
+  .field.req::after {
+    content: "*"; position: absolute; top: -8px; right: -8px;
+    font-size: 18px; font-weight: 700; line-height: 1;
+  }
+  input, textarea {
+    width: 100%; font: inherit; font-size: 18px; color: var(--white);
+    background: var(--field);
+    border: 1px solid var(--field-line); border-radius: 8px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 6px rgba(0,0,30,.25);
+    -webkit-appearance: none; appearance: none;
+  }
+  textarea { min-height: 128px; resize: vertical; line-height: 1.35; }
+  input::placeholder, textarea::placeholder { color: var(--ph); }
+  input:focus, textarea:focus { outline: none; border-color: var(--white); }
+  .bad { border-color: var(--err) !important; }
+
+
+  .hp { position: absolute; left: -9999px; }
+
+  .submit {
+    justify-self: start; margin-top: 18px;
+    background: #f3f3f3; color: #111;
+    font-size: 19px; font-weight: 700;
+    border-radius: 8px; padding: 11px 18px;
+    display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,30,.25);
+  }
+  .submit:active { transform: translateY(1px); }
+  .submit:disabled { opacity: .6; cursor: wait; }
+  .status { font-size: 15px; }
+  .status:empty { display: none; }
+  .status.ng { color: var(--err); }
+
+  /* ---- 送信完了 ---- */
+  .done { display: none; margin-top: 40px; font-size: 18px; line-height: 1.7; }
+  body.sent form, body.sent .lead { display: none; }
+  body.sent .done { display: block; }
+  .back { display: inline-block; margin-top: 24px; font-weight: 700; }
+
+  footer {
+    border-top: 1px solid rgba(255,255,255,.18);
+    padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
+    text-align: center; font-weight: 700; font-size: 18px;
+  }
+  footer a { text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="cover" id="cover" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="avatar"><span class="circle"></span><span class="label">RYOTO.TAKEUCHI</span></div>
+
+    <h1>Request</h1>
+    <p class="lead">ご依頼・ご相談はこちらから。内容を確認してメールでご連絡します。</p>
+
+    <form id="form" novalidate>
+      <div class="group">
+        <div class="field req"><input name="name" required autocomplete="name" placeholder="Name"></div>
+        <div class="field req"><input name="email" type="email" required autocomplete="email" placeholder="Email"></div>
+        <div class="field"><input name="sns" placeholder="LINE / IG username @"></div>
+      </div>
+
+      <h2 class="big">Your project</h2>
+      <div class="group">
+        <div class="field req"><textarea name="message" required placeholder="依頼内容を教えてください（何を・いつまでに・予算など）"></textarea></div>
+      </div>
+
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+
+      <button type="submit" class="submit" id="send">Send request
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <p class="status" id="status" role="status"></p>
+    </form>
+
+    <div class="done">
+      <h2>Sent ✓</h2>
+      <p>ありがとうございます。内容を確認して、入力いただいたメールにご連絡します。</p>
+      <a class="back" href="./">← Back</a>
+    </div>
+  </div>
+
+  <footer><a href="./">← RYOTO TAKEUCHI</a></footer>
+
+<script>
+/* ==================================================================
+   設定
+   ================================================================== */
+const CONFIG = {
+  formEndpoint: "https://formspree.io/f/XXXXXXXX", // Formspree のフォームURL
+};
+/* ================================================================== */
+
+const $ = (id) => document.getElementById(id);
+
+/* ---- ブルースクリーン風テキストをタイプ表示 ---- */
+const BSOD = `A problem has been detected and your request has not been sent yet.
+
+REQUEST_NOT_FOUND
+
+If this is the first time you've seen this Stop error screen,
+fill in the form below. If this screen appears again, contact
+me on LINE.
+
+Technical Information:
+
+*** STOP: 0x19980906 (0x00000109, 0xR10T0000, 0x00000000, 0x00000000)
+`;
+(function typeCover() {
+  const el = $("cover");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = BSOD; return; }
+  let i = 0;
+  const cur = document.createElement("span"); cur.className = "cur";
+  const step = () => {
+    i = Math.min(BSOD.length, i + 3);
+    el.textContent = BSOD.slice(0, i);
+    el.appendChild(cur);
+    if (i < BSOD.length) setTimeout(step, 12);
+  };
+  step();
+})();
+
+/* ---- 送信 ---- */
+const form = $("form"), status = $("status"), send = $("send");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  let ok = true;
+  form.querySelectorAll("[required]").forEach((el) => {
+    const bad = !el.checkValidity();
+    el.classList.toggle("bad", bad);
+    if (bad) ok = false;
+  });
+  if (!ok) { status.className = "status ng"; status.textContent = "* の項目を確認してください"; return; }
+
+  send.disabled = true;
+  status.className = "status"; status.textContent = "Sending…";
+  try {
+    const res = await fetch(CONFIG.formEndpoint, {
+      method: "POST", body: new FormData(form), headers: { Accept: "application/json" },
+    });
+    if (!res.ok) throw new Error(res.status);
+    document.body.classList.add("sent");
+    scrollTo({ top: 0, behavior: "smooth" });
+  } catch {
+    status.className = "status ng";
+    status.innerHTML = '送信できませんでした。<a href="https://line.me/ti/p/9pq_8edbGT" target="_blank" rel="noopener">LINE</a>から連絡してください。';
+  } finally {
+    send.disabled = false;
+  }
+});
+form.addEventListener("input", (e) => e.target.classList.remove("bad"));
+</script>
+</body>
+</html>

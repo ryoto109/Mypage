@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>RYOTO TAKEUCHI</title>
+<meta name="description" content="竹内 稜人 / Ryoto Takeuchi">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000;
+    --ink: #84898e;     /* 通常テキスト（グレー） */
+    --hi: #fff;         /* ホバー */
+    --gold: rgba(168,145,65,.3);
+    --red: #f00007;
+    --yellow: #ffc700;
+    --blue: #40aaff;
+    --mono: "JetBrains Mono", "Noto Sans JP", ui-monospace, Menlo, monospace;
+    /* スマホ基準の大きめ可変サイズ */
+    --fs: clamp(26px, 7.7vw, 64px);
+    --lh: .97;
+    --rule: clamp(3px, .8vw, 4px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: var(--fs);
+    line-height: var(--lh);
+    letter-spacing: -.03em;
+    text-transform: uppercase;
+    min-height: 100svh;
+    padding: calc(10px + env(safe-area-inset-top)) 0 calc(24px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-transform: inherit; letter-spacing: inherit; text-align: left; }
+  main { max-width: 1100px; }
+
+  section {
+    border-left: var(--rule) solid var(--gold);
+    padding: 6px 12px 6px 10px;
+    margin: 0 16px 0 6px;
+  }
+  section + section { margin-top: 14px; }
+
+  /* ---- rows ---- */
+  .row {
+    display: flex; align-items: flex-start; gap: 0;
+    width: 100%;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: color .08s;
+  }
+  .row .no {
+    flex-shrink: 0; width: 4ch;
+    font-size: clamp(11px, 4vw, 20px); line-height: 1;
+    letter-spacing: 0; padding-top: .25em;
+  }
+  .row .txt { flex-grow: 1; overflow: hidden; text-overflow: clip; }
+  .jp { font-family: "Noto Sans JP", sans-serif; font-weight: 700; letter-spacing: 0; }
+  .row.act:hover, .row.act:focus-visible, .row.act:active { color: var(--hi); outline: none; }
+  .row.act:hover .txt::after, .row.act:focus-visible .txt::after { content: "↗"; }
+  .row.copy:hover .txt::after { content: "⧉"; }
+
+  .sub { color: inherit; opacity: .55; }
+
+  /* ---- 次の誕生日 / リンク ---- */
+  section.next {
+    border-left: 0; position: relative; cursor: default;
+  }
+  section.next::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--rule);
+    background: linear-gradient(180deg, var(--red) 0, var(--bg));
+  }
+  .next .row { color: var(--red); }
+  .links { color: var(--yellow); white-space: normal; padding-left: 4ch; }
+  .links a, .links button { display: inline; }
+  .links a:hover, .links button:hover { color: var(--hi); }
+  .sep { opacity: .6; }
+
+  section.clock { border-color: var(--blue); color: var(--blue); }
+
+  .tab { font-variant-numeric: tabular-nums; }
+
+  /* ---- toast ---- */
+  .toast {
+    position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+    background: var(--yellow); color: #000;
+    font-size: clamp(14px, 4.5vw, 22px); padding: 10px 12px;
+    transform: translateY(160%); transition: transform .18s steps(4);
+    pointer-events: none;
+  }
+  .toast.on { transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <div class="row"><span class="no">001</span><span class="txt" id="nameEn"></span></div>
+    <button class="row act copy" id="nameJpRow"><span class="no">002</span><span class="txt jp" id="nameJp"></span></button>
+    <button class="row act copy" id="bdayRow"><span class="no">003</span><span class="txt">Born <span id="bday"></span></span></button>
+    <div class="row"><span class="no">004</span><span class="txt">Age <span id="age"></span></span></div>
+    <a class="row act" id="lineRow" target="_blank" rel="noopener"><span class="no">005</span><span class="txt">LINE: Add friend</span></a>
+    <a class="row act" href="request.html"><span class="no">006</span><span class="txt">Request</span></a>
+  </section>
+
+  <section class="next">
+    <div class="row"><span class="no">TBD</span><span class="txt">Next b-day</span></div>
+    <div class="row"><span class="no"></span><span class="txt tab" id="countdown">--D --:--:--</span></div>
+    <p class="links">
+      <button id="share">Share↗</button>
+      <span class="sep">///</span>
+      <button id="copyUrl">Copy URL</button>
+    </p>
+  </section>
+
+
+  <section class="clock">
+    <div class="row"><span class="no">TYO</span><span class="txt tab" id="clock">--:--:--</span></div>
+  </section>
+</main>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* ==================================================================
+   PROFILE — ここだけ書き換えればOK
+   ================================================================== */
+const PROFILE = {
+  nameEn:   "Ryoto Takeuchi",
+  nameJp:   "竹内 稜人",
+  birthday: "1998-09-06",                      // YYYY-MM-DD
+  lineUrl:  "https://line.me/ti/p/9pq_8edbGT", // LINEアプリ「自分のQRコード → リンクをコピー」で取得したURL
+};
+/* ================================================================== */
+
+const $ = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, "0");
+
+const [by, bm, bd] = PROFILE.birthday.split("-").map(Number);
+const bdayText = `${by}.${pad(bm)}.${pad(bd)}`;
+
+function tokyoNow() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+}
+function ageAt(t) {
+  let a = t.getFullYear() - by;
+  if (t < new Date(t.getFullYear(), bm - 1, bd)) a--;
+  return a;
+}
+
+$("nameEn").textContent = PROFILE.nameEn;
+$("nameJp").textContent = PROFILE.nameJp;
+$("bday").textContent = bdayText;
+$("age").textContent = ageAt(tokyoNow());
+$("lineRow").href = PROFILE.lineUrl;
+
+let toastTimer;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("on"), 1400);
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Copied: " + text); }
+  catch { toast(text); }
+}
+$("nameJpRow").addEventListener("click", () => copy(PROFILE.nameJp));
+$("bdayRow").addEventListener("click", () => copy(bdayText));
+$("copyUrl").addEventListener("click", () => copy(location.href));
+$("share").addEventListener("click", async () => {
+  const data = { title: PROFILE.nameEn, text: `${PROFILE.nameJp} / ${PROFILE.nameEn}`, url: location.href };
+  if (navigator.share) { try { await navigator.share(data); } catch {} }
+  else copy(location.href);
+});
+
+function tick() {
+  const t = tokyoNow();
+  $("clock").textContent = `${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
+
+  let next = new Date(t.getFullYear(), bm - 1, bd);
+  if (t >= next) next = new Date(t.getFullYear() + 1, bm - 1, bd);
+  const s = Math.floor((next - t) / 1000);
+  const d = Math.floor(s / 86400), h = Math.floor(s / 3600) % 24, m = Math.floor(s / 60) % 60;
+  $("countdown").textContent = `${d}D ${pad(h)}:${pad(m)}:${pad(s % 60)}`;
+}
+tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
