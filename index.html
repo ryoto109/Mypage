@@ -261,7 +261,7 @@ async function nfcWelcome() {
   const a = await retro.dialog({
     title: "Friend Request Accepted",
     icon: "info",
-    message: `Congratulations!\nYou have been recognized as a FRIEND by Ryoto Takeuchi.\n竹内稜人に友達として認められました。おめでとう！\nFriend ID: #${f.id} / Since ${f.since}`,
+    message: `Congratulations!\nYou have been recognized as a FRIEND by Ryoto Takeuchi.\n友達として認められました。おめでとう！\nFriend ID: #${f.id} / Since ${f.since}`,
     buttons: ["Add on LINE", "OK"],
   });
   if (a === "Add on LINE") window.open(PROFILE.lineUrl, "_blank", "noopener");
