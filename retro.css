@@ -36,6 +36,49 @@
 .w98-btn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
 .w98-btn:focus-visible, .w98-btn.def:focus { outline: 1px dotted #000; outline-offset: -5px; }
 
+.w98-field { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.w98-field input {
+  flex: 1; min-width: 0; font-size: 16px; padding: 3px 4px; border: 0; border-radius: 0; background: #fff; color: #000;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+}
+.w98-field input:focus { outline: none; }
+
+/* ---- 全画面 ---- */
+.w98-screen { position: fixed; inset: 0; z-index: 1003; overflow: auto; cursor: pointer; outline: none; text-transform: none; letter-spacing: normal; }
+.w98-screen.apache { background: #fff; color: #000; font: 16px/1.4 "Times New Roman", Times, serif; padding: 20px 16px; }
+.w98-screen.apache h1 { font-size: 32px; font-weight: 700; margin: 0 0 18px; }
+.w98-screen.apache p { margin: 0 0 16px; }
+.w98-screen.apache hr { border: 0; border-top: 1px solid #888; margin: 16px 0 8px; }
+.w98-screen.apache address { font-style: italic; }
+.w98-screen.bsod {
+  background: #0000aa; color: #fff; font: 15px/1.5 "JetBrains Mono", ui-monospace, Menlo, monospace;
+  display: grid; place-items: center; padding: 24px 20px;
+}
+.w98-screen.bsod .box { max-width: 620px; }
+.w98-screen.bsod .head { display: table; margin: 0 auto 22px; background: #aaa; color: #0000aa; padding: 0 8px; font-weight: 700; }
+.w98-screen.bsod p { margin-bottom: 16px; }
+.w98-screen.bsod .cont { text-align: center; }
+.w98-screen.bsod .cur { animation: w98-blink 1s steps(1) infinite; }
+.w98-screen.term {
+  background: #000; color: #00ff41; font: 14px/1.7 "JetBrains Mono", ui-monospace, Menlo, monospace;
+  padding: calc(24px + env(safe-area-inset-top)) 18px; text-shadow: 0 0 6px rgba(0,255,65,.6);
+}
+.w98-screen.term::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px);
+}
+.w98-screen.win { background: rgba(0,0,0,.35); display: grid; place-items: center; padding: 16px; cursor: default; }
+.w98-note { width: min(460px, 100%); }
+.w98-note .menu { display: flex; gap: 14px; padding: 3px 6px; font-size: 13px; }
+.w98-note .menu u { text-decoration: underline; }
+.w98-note .paper {
+  background: #fff; margin: 2px; padding: 8px 10px; min-height: 220px;
+  font: 14px/1.7 "Courier New", Courier, monospace; white-space: pre-wrap; word-break: break-word;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+}
+.w98-note .paper .rd { background: #000; color: #000; user-select: none; }
+@keyframes w98-blink { 50% { opacity: 0; } }
+
 /* ---- モーダル ---- */
 .w98-modal {
   position: fixed; inset: 0; z-index: 1000;
