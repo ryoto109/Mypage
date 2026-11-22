@@ -125,6 +125,7 @@
   }
   footer a { text-decoration: none; }
 </style>
+<link rel="stylesheet" href="retro.css">
 </head>
 <body>
   <div class="cover" id="cover" aria-hidden="true"></div>
@@ -164,6 +165,7 @@
 
   <footer><a href="./">← RYOTO TAKEUCHI</a></footer>
 
+<script src="retro.js"></script>
 <script>
 /* ==================================================================
    設定
@@ -231,6 +233,21 @@ form.addEventListener("submit", async (e) => {
   }
 });
 form.addEventListener("input", (e) => e.target.classList.remove("bad"));
+
+/* ---- 書きかけのまま戻ろうとしたら Win98風に確認 ---- */
+const dirty = () => !document.body.classList.contains("sent") &&
+  [...form.querySelectorAll("input:not(.hp), textarea")].some((el) => el.value.trim());
+document.querySelectorAll('a[href="./"]').forEach((a) => a.addEventListener("click", async (e) => {
+  if (!dirty()) return;
+  e.preventDefault();
+  const ans = await retro.dialog({
+    title: "Request Wizard",
+    message: "The new request has not been sent yet.\nAre you sure you want to exit the wizard?",
+    buttons: ["Yes", "No"],
+  });
+  if (ans === "Yes") retro.go(a.href);
+}));
+addEventListener("beforeunload", (e) => { if (dirty() && !document.querySelector(".w98-trans")) e.preventDefault(); });
 </script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <meta name="description" content="竹内 稜人 / Ryoto Takeuchi">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=VT323&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #000;
@@ -87,6 +87,19 @@
   .links a:hover, .links button:hover { color: var(--hi); }
   .sep { opacity: .6; }
 
+  /* ---- アクセスカウンター ---- */
+  .topbar {
+    display: flex; justify-content: flex-end; align-items: center; gap: 8px;
+    margin: 0 16px 10px 6px;
+    font-size: clamp(10px, 3vw, 13px); letter-spacing: .04em; line-height: 1;
+  }
+  .counter { display: inline-flex; gap: 2px; padding: 2px; background: #1a1a1a; border: 1px solid #333; }
+  .counter .d {
+    font-family: "VT323", monospace; font-size: clamp(20px, 6vw, 26px); line-height: .9;
+    width: .62em; text-align: center; letter-spacing: 0;
+    background: #000; color: #ff2a1a; text-shadow: 0 0 6px rgba(255,42,26,.8);
+  }
+
   section.clock { border-color: var(--blue); color: var(--blue); }
 
   .tab { font-variant-numeric: tabular-nums; }
@@ -102,14 +115,16 @@
   .toast.on { transform: translateY(0); }
   @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
 </style>
+<link rel="stylesheet" href="retro.css">
 </head>
 <body>
 <main>
+  <div class="topbar"><span>Visitor No.</span><span class="counter" id="counter" aria-label="Visitor count"></span></div>
   <section>
     <a class="row act" href="profile.html"><span class="no">001</span><span class="txt" id="nameEn"></span></a>
     <button class="row act copy" id="nameJpRow"><span class="no">002</span><span class="txt jp" id="nameJp"></span></button>
     <button class="row act copy" id="bdayRow"><span class="no">003</span><span class="txt">Born <span id="bday"></span></span></button>
-    <div class="row"><span class="no">004</span><span class="txt">Age <span id="age"></span></span></div>
+    <button class="row act" id="ageRow"><span class="no">004</span><span class="txt">Age <span id="age"></span></span></button>
     <a class="row act" id="lineRow" target="_blank" rel="noopener"><span class="no">005</span><span class="txt">LINE: Add friend</span></a>
     <a class="row act" href="request.html"><span class="no">006</span><span class="txt">Request</span></a>
   </section>
@@ -132,6 +147,7 @@
 
 <div class="toast" id="toast">Copied</div>
 
+<script src="retro.js"></script>
 <script>
 /* ==================================================================
    PROFILE — ここだけ書き換えればOK
@@ -197,6 +213,36 @@ function tick() {
   $("countdown").textContent = `${d}D ${pad(h)}:${pad(m)}:${pad(s % 60)}`;
 }
 tick(); setInterval(tick, 1000);
+
+/* ---- 年齢をタップ：Win98風ダイアログ ---- */
+$("ageRow").addEventListener("click", async () => {
+  const a = await retro.dialog({
+    title: "System Properties",
+    message: `Age ${ageAt(tokyoNow())} is read-only.\nDo you want to roll back to ${bdayText}?`,
+    buttons: ["Yes", "No"],
+  });
+  if (a === "Yes") await retro.dialog({ title: "Error", message: "Access is denied.\nTime only moves forward.", buttons: ["OK"] });
+});
+
+/* ==================================================================
+   アクセスカウンター（CounterAPI v2）
+   workspace を入れると動きます。空のあいだは ------ 表示
+   ================================================================== */
+const COUNTER = { workspace: "", name: "home" };
+(async function counter() {
+  const box = $("counter");
+  const show = (v) => { box.innerHTML = String(v).padStart(6, "0").split("").map((d) => `<span class="d">${d}</span>`).join(""); };
+  show("------");
+  if (!COUNTER.workspace) return;
+  let first = true;
+  try { first = !sessionStorage.getItem("counted"); } catch {}
+  try {
+    const res = await fetch(`https://api.counterapi.dev/v2/${COUNTER.workspace}/${COUNTER.name}${first ? "/up" : ""}`);
+    const j = await res.json();
+    const n = Number(j?.data?.up_count ?? j?.data?.count ?? j?.count ?? j?.value);
+    if (Number.isFinite(n)) { show(n); try { sessionStorage.setItem("counted", "1"); } catch {} }
+  } catch {}
+})();
 
 </script>
 </body>

@@ -1,0 +1,98 @@
+/* ==================================================================
+   retro.css — Win98風ダイアログ / ページ遷移の演出（全ページ共通）
+   ================================================================== */
+.w98, .w98 * {
+  font-family: Tahoma, "MS UI Gothic", "Noto Sans JP", "Hiragino Sans", sans-serif;
+  text-transform: none; letter-spacing: normal; line-height: 1.35;
+  -webkit-font-smoothing: none; font-smooth: never;
+  box-sizing: border-box;
+}
+.w98 {
+  background: #c0c0c0; color: #000; font-size: 13px;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080, inset 2px 2px #fff;
+  padding: 3px;
+}
+.w98-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #fff; font-weight: 700; font-size: 13px;
+  padding: 3px 3px 3px 6px; user-select: none;
+}
+.w98-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.w98-x {
+  flex-shrink: 0; width: 18px; height: 16px; padding: 0; border: 0; cursor: pointer;
+  background: #c0c0c0; color: #000; font-size: 11px; font-weight: 700; line-height: 14px;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+}
+.w98-body { display: flex; gap: 16px; align-items: flex-start; padding: 18px 16px 10px; }
+.w98-icon { flex-shrink: 0; width: 34px; height: 34px; }
+.w98-msg p + p { margin-top: 12px; }
+.w98-btns { display: flex; justify-content: center; gap: 8px; padding: 8px 12px 10px; }
+.w98-btn {
+  min-width: 78px; padding: 5px 12px; border: 0; cursor: pointer;
+  background: #c0c0c0; color: #000; font-size: 13px;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+}
+.w98-btn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
+.w98-btn:focus-visible, .w98-btn.def:focus { outline: 1px dotted #000; outline-offset: -5px; }
+
+/* ---- モーダル ---- */
+.w98-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center; padding: 16px;
+  background: rgba(0, 0, 0, .15);
+}
+.w98-dlg { width: min(420px, 100%); }
+
+/* ---- ページ遷移：ダウンロード風 ---- */
+.w98-trans {
+  position: fixed; inset: 0; z-index: 1001;
+  display: grid; place-items: center; padding: 16px;
+  background: #000;
+  animation: w98-flicker .12s steps(2) infinite;
+}
+.w98-trans::after { /* 走査線 */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px);
+}
+.w98-trans .w98-dlg { position: relative; z-index: 1; }
+.w98-dl .w98-body { display: block; padding: 14px 14px 12px; }
+.w98-dl .anim { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 12px; }
+.w98-dl .anim .fly { flex: 1; height: 16px; position: relative; overflow: hidden; }
+.w98-dl .anim .fly i {
+  position: absolute; top: 2px; width: 10px; height: 12px; background: #fff;
+  box-shadow: inset -1px -1px #808080, 1px 1px #000;
+  animation: w98-fly .7s linear infinite;
+}
+.w98-dl .anim .fly i:nth-child(2) { animation-delay: .23s; }
+.w98-dl .anim .fly i:nth-child(3) { animation-delay: .46s; }
+.w98-dl .path { font-size: 12px; margin-bottom: 10px; word-break: break-all; }
+.w98-bar {
+  height: 20px; padding: 3px; background: #fff;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+}
+.w98-bar i {
+  display: block; height: 100%; width: 0;
+  background: repeating-linear-gradient(90deg, #000080 0 9px, transparent 9px 11px);
+}
+.w98-dl .small { font-size: 12px; margin-top: 8px; }
+.w98-dl .warn { color: #800000; }
+@keyframes w98-fly { from { left: -12px; } to { left: 100%; } }
+@keyframes w98-flicker { 50% { background: #050805; } }
+
+/* ---- ページ到着：ブラウン管が点く ---- */
+.crt-on {
+  position: fixed; inset: 0; z-index: 1002; pointer-events: none; background: #000;
+  animation: crt-fade .5s .28s ease-out forwards;
+}
+.crt-on::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px;
+  background: #fff; box-shadow: 0 0 12px #fff;
+  transform: scaleX(0); animation: crt-line .3s ease-out forwards;
+}
+@keyframes crt-line { 60% { transform: scaleX(1); height: 2px; } 100% { transform: scaleX(1) scaleY(60); opacity: 0; } }
+@keyframes crt-fade { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .crt-on { display: none; }
+  .w98-trans { animation: none; }
+}
